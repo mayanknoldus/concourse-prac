@@ -1,0 +1,28 @@
+---
+resources:
+- name: sourcecode
+  type: git
+  source:
+    url: https://github.com/rseroter/pluralsight-concourse-dotnetcore
+    branch: master
+
+jobs:
+  - name: firstjob
+    plan:
+    - get: sourcecode
+    - task: first-task
+      config:
+        platform: linux
+        image_resource:
+            type: docker-image
+            source: {repository: ubuntu}
+        
+        inputs:
+        - name: sourcecode
+
+        outputs:
+        - name: output-folder
+        
+        run:
+          path: find
+          args: [.]

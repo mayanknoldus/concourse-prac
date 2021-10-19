@@ -1,0 +1,79 @@
+# ---
+# jobs:
+# # Try to trigger the job multiple times and see what happens
+# deploying k time jb tk phli na chl jae dusri pending rhegi
+# - name: serial-job
+#   public: true
+#   serial: true
+#   plan:
+#   - task: simple-task
+
+
+
+---
+resources:
+- name: concourse-examples
+  type: git
+  icon: github
+  check_every: 30m
+  source:
+    uri: https://github.com/concourse/examples
+
+jobs:
+# update this pipeline before updating child pipelines
+- name: set-self
+  public: true
+  plan:
+  - get: concourse-examples
+    trigger: true
+  - set_pipeline: self
+    file: concourse-examples/pipelines/set-pipelines.yml
+
+
+
+# ((abc))
+
+# var.yml
+# ---
+# abc: hi 
+
+
+
+# resources:
+# - name: every-30s
+#   type: time
+#   icon: clock-outline
+#   source:
+#     interval: 30s
+
+
+
+# task-config: &task-config
+#   platform: linux
+#   image_resource:
+#     type: registry-image
+#     source: { repository: busybox }
+
+#  - task: successful-task
+#       config:
+#         << : *task-config
+#         run:
+#           path: sh
+#           args: ["-lc", "exit 0"]
+#       on_success:
+#         task: task-success
+#         config:
+#           << : *task-config
+#           run:
+#             path: echo
+#             args: ["This task succeeded!"]
+
+# on_success:                  #job.on_failure  job.on_abort              success ho gya to baki dono ignore
+#     task: job-success
+#     config:
+#       << : *task-config
+#       run:
+#         path: echo
+#         args: ["This job succeeded!"]
+
+

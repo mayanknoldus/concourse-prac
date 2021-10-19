@@ -1,0 +1,38 @@
+---
+resources:
+- name: sourcecode
+  type: git
+  source:
+    uri: "https://github.com/mayanknoldus/OopsAssignment2"
+    branch: master
+    # private_key: ((private-repo-key))
+
+jobs:
+  - name: firstjob
+    plan:
+    - get: sourcecode
+      trigger: true
+    - task: one
+      config:
+        platform: linux
+        image_resource:
+            type: docker-image
+            source: {repository: ubuntu}
+        
+        inputs:
+        - name: sourcecode
+
+        outputs:
+        - name: output-folder
+        
+        run:
+          path: find
+          args: [.]
+
+  #   - task: second-task
+
+  # - name: secondjob
+  #   plan:
+  #     - get: 
+  #     - task:
+  #       config:

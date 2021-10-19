@@ -1,0 +1,82 @@
+# ---
+# platform: linux
+
+# image_resource:
+#   type: docker-image
+#   source:
+#     repository: maven
+#     tag: 3.6.0-jdk-8-alpine
+
+# inputs:
+#   - name: spring-boot-service       # konse input resource pe chlani h command
+
+# run:
+#   path: mvn
+#   args:
+#     - -f
+#     - spring-boot-service/pom.xml
+#     - clean
+#     - test
+
+# ---
+# platform: linux
+
+# image_resource:
+#   type: docker-image
+#   source:
+#     repository: maven
+#     tag: 3.6.0-jdk-8-alpine
+
+# inputs:
+#   - name: spring-boot-service
+
+# run:
+#   path: mvn
+#   args:
+#     - -f
+#     - spring-boot-service/pom.xml
+#     - clean
+#     - package
+
+# outputs:
+#   - name: spring-boot-service-output
+#     path: spring-boot-service
+
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: spring-boot-deployment
+#   labels:
+#     app: spring-boot-app
+# spec:
+#   replicas: 3
+#   selector:
+#     matchLabels:
+#       app: spring-boot-app
+#   template:
+#     metadata:
+#       labels:
+#         app: spring-boot-app
+#     spec:
+#       containers:
+#         - name: spring-boot-container
+#           image: azmathasan92/hellospringboot:latest
+#           imagePullPolicy: Always
+#           ports:
+#             - containerPort: 8080
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: spring-boot-service-node-port
+# spec:
+#   selector:
+#     app: spring-boot-app
+#   type: NodePort
+#   ports:
+#     - port: 8080
+#       targetPort: 8080
+#       nodePort: 31000
+

@@ -1,0 +1,118 @@
+# jobs:
+# - name: job-1
+#   plan:
+#   - config:
+#       image_resource:
+#         name: ""
+#         source:
+#           repository: busybox
+#         type: registry-image
+#       outputs:
+#       - name: output-folder
+#       platform: linux
+#       run:
+#         args:
+#         - -cx
+#         - |
+#           ls -l 
+#           echo "hello from another step!" > output-folder/a.txt
+#         path: sh
+#     task: task1
+#   - config:
+#       image_resource:
+#         name: ""
+#         source:
+#           repository: busybox
+#         type: registry-image
+#       inputs:
+#       - name: output-folder
+#       platform: linux
+#       run:
+#         args:
+#         - -cx
+#         - |
+#           ls -l 
+#           cat output-folder/a.txt
+#         path: sh
+#     task: second
+
+
+
+---
+resources:
+- name: repo
+  type: git
+  icon: github
+  source:
+    uri: https://github.com/nodejs/nodejs.org.git
+
+- name: node-image
+  type: registry-image
+  source:
+    repository: node
+    tag: 13.10.1-stretch
+
+jobs:
+- name: test
+  public: true
+  plan:
+  - get: node-image
+  - get: repo
+    trigger: true
+  - task: install
+    image: node-image
+    config:
+      inputs:
+      - name: repo
+      outputs:
+      - name: dependencies
+        path: repo/node_modules
+      platform: linux
+      run:
+        path: npm
+        args:
+          - cache clean --force
+        path: rm
+        args: #["install"]
+          - -rf 
+          - node_modules
+          - package-lock.json
+        path: npm
+        args: 
+          - install  
+          - start  
+        dir: repo
+  - task: test
+    image: node-image
+    config:
+      inputs:
+      - name: repo
+      - name: dependencies
+        path: repo/node_modules
+      platform: linux
+      run:
+        path: npm
+        args: #["run", "test"]
+          - run
+          - test
+        dir: repo
+
+
+
+
+
+
+
+      #    # Tells Concourse which type of worker this task should run on
+      # platform: linux
+      # # This is one way of telling Concourse which container image to use for a
+      # # task. We'll explain this more when talking about resources
+      # image_resource:
+      #   type: registry-image
+      #   source:
+      #     repository: busybox # images are pulled from docker hub by default
+      # # The command Concourse will run inside the container
+      # # echo "Hello world!"
+      # run:
+      #   path: echo
+      #   args: ["Hello world!"]
